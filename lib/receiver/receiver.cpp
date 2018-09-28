@@ -83,7 +83,7 @@ uint32_t lastPacket = 0;
 //BTN, LED, LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS, LORA_RST, LORA_IRQ, BAND, spreadingFactor, SignalBandwidth, codingRateDenominator, uint32_t LOWCONTRAST_TIME, uint32_t DISPLAYOFF_TIME, uint32_t lastPacket
 //BTN, lastLight, lowContrast, DISPLAYOFF_TIME, LOWCONTRAST_TIME, lastPacket, LED, LOW, 
 //display, LORA
-int receiver() {
+void receiver() {
   Serial.println("_______");
   Serial.println("receiver");
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
@@ -142,7 +142,6 @@ int receiver() {
   int packetSize = LoRa.parsePacket();
   Serial.print("LoRa.parsePacket() ");
   Serial.println(packetSize);
-  return(packetSize);
   if (packetSize) {
     // received a packets
     Serial.print(F("Received packet: \""));
@@ -169,7 +168,7 @@ int receiver() {
     //display.drawString(0, 45, (String)LoRa.packetRssi() + F("dB (") + (String)LoRa.packetSnr() + F("dB)"));
     //display.display();
 
-    digitalWrite(LED, HIGH);
-    lastPacket = millis();
+    //digitalWrite(LED, HIGH);
+    //lastPacket = millis();
   }
 }

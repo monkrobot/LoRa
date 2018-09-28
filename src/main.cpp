@@ -108,10 +108,10 @@ void setup() {
 }
 
 void loop() {
-
-  int data = receiver();
-  Serial.print("data ");
-  Serial.println(data);
-  display.drawString(0, 20, (String)data);
-  display.display();
+  receiver();
+  //int data = receiver();
+  //Serial.print("data ");
+  //Serial.println(data);
+  //display.drawString(0, 20, (String)data);
+  //display.display();
 }
