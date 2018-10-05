@@ -112,7 +112,7 @@ void setup() {
 
   lastLight = millis();
   
-  
+  //display.end();
 }
 
 void loop() {
@@ -126,8 +126,11 @@ void loop() {
     //Serial.println("Receiver");
     //Serial.println(receiver_loop);
     //Serial.println(last_rec_l);
+    //receiver();
+
+    Receiver receiver_instance;
+    receiver_instance.receiver();
     receiver_loop = millis();
-    receiver();
   };
   
   //delay(100);
@@ -138,8 +141,12 @@ void loop() {
     Serial.println("Sender");
     Serial.println(sender_loop);
     Serial.println(last_send_l);
+    
+    //sender();
+
+    Sender sender_instance;
+    sender_instance.sender();
     sender_loop = millis();
-    sender();
   };
   last_rec_l = millis();
   last_send_l = millis();
