@@ -26,22 +26,10 @@ SSD1306 display;
 #define preambleLength 8
 #define codingRateDenominator 8
 
-const uint32_t LOWCONTRAST_TIME = 25000; // 25 sec.
-const uint32_t DISPLAYOFF_TIME = 30000; // 30 sec.
 
-uint32_t lastLight;
-
-//uint32_t receiver_loop;
-//uint32_t sender_loop;
-
-const uint32_t STEP_DURATION = 2000; // 2 sec.
-
-uint32_t lastStep = 0;
-
-//Receiver
-uint32_t lastPacket = 0;
-int last_rec_l = 0;
-int last_send_l = 0;
+uint32_t timer_loop = millis();
+int receiver_time = 5000;
+int sender_time = 5000;
 
 //
 void setup() {
@@ -60,12 +48,9 @@ void setup() {
   display.drawString(0, 5, F("LoRa Sender"));
   display.display();
 
-  // Receiver
-  Serial.println(F("LoRa Receiver"));
   display.drawString(0, 20, F("LoRa Receiver"));
   display.display();
 
-  //
   SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
   Serial.println(F("LoRa Sender"));
@@ -77,13 +62,10 @@ void setup() {
     while (1);
   }
 
-  //Receiver
   Serial.println(F("LoRa Initialization OK!"));
-
   Serial.print(F("LoRa Frequency: "));
   Serial.println(BAND);
 
-  //
   Serial.print(F("LoRa Spreading Factor: "));
   Serial.println(spreadingFactor);
   LoRa.setSpreadingFactor(spreadingFactor); //Spreading factor affects how far apart the radio's transmissions are,
@@ -100,54 +82,32 @@ void setup() {
   LoRa.setCodingRate4(codingRateDenominator);
   LoRa.setPreambleLength(preambleLength);
 
-  Serial.println(F("LoRa Initialization OK!"));
   display.drawString(0, 40, F("LoRa Initializing OK!"));
   display.display();
 
   display.setFont(ArialMT_Plain_16);
-
   delay(1500);
-
   display.setContrast(63);
-
-  lastLight = millis();
-  
-  //display.end();
 }
 
 void loop() {
-  uint32_t receiver_loop = millis();
   
-  //for (int i=0;i<10000;i++){
-  //  receiver();
-  //}
-  while ((receiver_loop - last_rec_l) < 2000)
-  {
-    //Serial.println("Receiver");
-    //Serial.println(receiver_loop);
-    //Serial.println(last_rec_l);
-    //receiver();
 
-    Receiver receiver_instance;
+  int timer_l = timer_loop;
+  while (timer_loop < timer_l+receiver_time)
+  {
+    Receiver receiver_instance = Receiver(1);
     receiver_instance.receiver();
-    receiver_loop = millis();
+
+    timer_loop = millis();
   };
   
-  //delay(100);
-
-  uint32_t sender_loop = millis();
-  while ((sender_loop - last_send_l) < 5000)
+  timer_l = timer_loop;
+  while (timer_loop < timer_l+sender_time)
   {
-    Serial.println("Sender");
-    Serial.println(sender_loop);
-    Serial.println(last_send_l);
-    
-    //sender();
-
-    Sender sender_instance;
+    Sender sender_instance = Sender(1);
     sender_instance.sender();
-    sender_loop = millis();
+
+    timer_loop = millis();
   };
-  last_rec_l = millis();
-  last_send_l = millis();
 }

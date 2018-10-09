@@ -220,229 +220,32 @@ void loop() {
 
 
 
+
+
+
+
+
+
+
+/*
+ Repeat timer example
+ This example shows how to use hardware timer in ESP32. The timer calls onTimer
+ function every second. The timer can be stopped with button attached to PIN 0
+ (IO0).
+ This example code is in the public domain.
+ */
+
+// Stop button is attached to PIN 0 (IO0)
+
 #include <SSD1306.h> // alias for `#include "SSD1306Wire.h"`
 
 #include <SPI.h>
 #include <LoRa.h>
+
 #include <receiver.h>
 #include <sender.h>
 
-#define BTN 0
-#define LED 25
-
-SSD1306 display;
-
-// WIFI_LoRa_32 ports
-#define LORA_SCK 5
-#define LORA_MISO 19
-#define LORA_MOSI 27
-#define LORA_CS 18
-#define LORA_RST 14
-#define LORA_IRQ 26
-
-// #define BAND 429E6 // 915E6
-#define BAND 433E6
-#define spreadingFactor 9
-// #define SignalBandwidth 62.5E3
-#define SignalBandwidth 31.25E3
-#define preambleLength 8
-#define codingRateDenominator 8
-
-const uint32_t LOWCONTRAST_TIME = 25000; // 25 sec.
-const uint32_t DISPLAYOFF_TIME = 30000; // 30 sec.
-
-uint32_t lastLight;
-
-//uint32_t receiver_loop;
-//uint32_t sender_loop;
-
-const uint32_t STEP_DURATION = 2000; // 2 sec.
-
-uint32_t lastStep = 0;
-
-//Receiver
-uint32_t lastPacket = 0;
-int last_rec_l = 0;
-int last_send_l = 0;
-
-//
-void setup() {
-  pinMode(BTN, INPUT_PULLUP);
-  pinMode(LED, OUTPUT); // Send success, LED will bright 1 second
-
-  Serial.begin(9600);
-  while (! Serial); // If just the the basic function, must connect to a computer
-  Serial.println();
-
-// Initialising the UI will init the display too.
-  display.init();
-  display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawString(0, 5, F("LoRa Sender"));
-  display.display();
-
-  // Receiver
-  Serial.println(F("LoRa Receiver"));
-  display.drawString(0, 20, F("LoRa Receiver"));
-  display.display();
-
-  //
-  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-  LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  Serial.println(F("LoRa Sender"));
-
-  if (! LoRa.begin(BAND)) {
-    Serial.println(F("Starting LoRa failed!"));
-    display.drawString(0, 40, F("Starting LoRa failed!"));
-    display.display();
-    while (1);
-  }
-
-  //Receiver
-  Serial.println(F("LoRa Initialization OK!"));
-
-  Serial.print(F("LoRa Frequency: "));
-  Serial.println(BAND);
-
-  //
-  Serial.print(F("LoRa Spreading Factor: "));
-  Serial.println(spreadingFactor);
-  LoRa.setSpreadingFactor(spreadingFactor); //Spreading factor affects how far apart the radio's transmissions are,
-                                            //across the available bandwidth.
-                                            //Radios with different spreading factors will not receive each
-                                            //other's transmissions.
-                                            //This is one way you can filter out radios you want to ignore,
-                                            //without making an addressing scheme.
-                                             
-  Serial.print(F("LoRa Signal Bandwidth: "));
-  Serial.println(SignalBandwidth);
-  LoRa.setSignalBandwidth(SignalBandwidth); //Change the signal bandwidth (пропускная способность) of the radio.
-
-  LoRa.setCodingRate4(codingRateDenominator);
-  LoRa.setPreambleLength(preambleLength);
-
-  Serial.println(F("LoRa Initialization OK!"));
-  display.drawString(0, 40, F("LoRa Initializing OK!"));
-  display.display();
-
-  display.setFont(ArialMT_Plain_16);
-
-  delay(1500);
-
-  display.setContrast(63);
-
-  lastLight = millis();
-  
-  //display.end();
-}
-
-void loop() {
-  uint32_t receiver_loop = millis();
-  
-  //for (int i=0;i<10000;i++){
-  //  receiver();
-  //}
-  while ((receiver_loop - last_rec_l) < 2000)
-  {
-    //Serial.println("Receiver");
-    //Serial.println(receiver_loop);
-    //Serial.println(last_rec_l);
-    //receiver();
-
-    Receiver receiver_instance;
-    receiver_instance.receiver();
-    receiver_loop = millis();
-  };
-  
-  //delay(100);
-
-  uint32_t sender_loop = millis();
-  while ((sender_loop - last_send_l) < 5000)
-  {
-    Serial.println("Sender");
-    Serial.println(sender_loop);
-    Serial.println(last_send_l);
-    
-    //sender();
-
-    Sender sender_instance;
-    sender_instance.sender();
-    sender_loop = millis();
-  };
-  last_rec_l = millis();
-  last_send_l = millis();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <SSD1306.h> // alias for `#include "SSD1306Wire.h"`
-
-#include <SPI.h>
-#include <LoRa.h>
-
-#include <sender.h>
-
 #define BTN_STOP_ALARM    0
-
-#define BTN 0
-#define LED 25
-
-SSD1306 display;
-
-// WIFI_LoRa_32 ports
-#define LORA_SCK 5
-#define LORA_MISO 19
-#define LORA_MOSI 27
-#define LORA_CS 18
-#define LORA_RST 14
-#define LORA_IRQ 26
-
-// #define BAND 429E6 // 915E6
-#define BAND 433E6
-#define spreadingFactor 9
-// #define SignalBandwidth 62.5E3
-#define SignalBandwidth 31.25E3
-#define preambleLength 8
-#define codingRateDenominator 8
-
-const uint32_t LOWCONTRAST_TIME = 25000; // 25 sec.
-const uint32_t DISPLAYOFF_TIME = 30000; // 30 sec.
-
-uint32_t lastLight;
-
-//uint32_t receiver_loop;
-//uint32_t sender_loop;
-
-const uint32_t STEP_DURATION = 2000; // 2 sec.
-
-uint32_t lastStep = 0;
-
-//Receiver
-uint32_t lastPacket = 0;
-int last_rec_l = 0;
-int last_send_l = 0;
-
-
 
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
@@ -450,6 +253,8 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 volatile uint32_t isrCounter = 0;
 volatile uint32_t lastIsrAt = 0;
+
+int flag = 1;
 
 void IRAM_ATTR onTimer(){
   // Increment the counter and set the time of ISR
@@ -463,75 +268,7 @@ void IRAM_ATTR onTimer(){
 }
 
 void setup() {
-  //Serial.begin(115200);
-
-  pinMode(BTN, INPUT_PULLUP);
-  pinMode(LED, OUTPUT); // Send success, LED will bright 1 second
-
   Serial.begin(9600);
-  while (! Serial); // If just the the basic function, must connect to a computer
-  Serial.println();
-
-// Initialising the UI will init the display too.
-  display.init();
-  display.flipScreenVertically();
-  display.setFont(ArialMT_Plain_10);
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawString(0, 5, F("LoRa Sender"));
-  display.display();
-
-  // Receiver
-  Serial.println(F("LoRa Receiver"));
-  display.drawString(0, 20, F("LoRa Receiver"));
-  display.display();
-
-  //
-  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-  LoRa.setPins(LORA_CS, LORA_RST, LORA_IRQ);
-  Serial.println(F("LoRa Sender"));
-
-  if (! LoRa.begin(BAND)) {
-    Serial.println(F("Starting LoRa failed!"));
-    display.drawString(0, 40, F("Starting LoRa failed!"));
-    display.display();
-    while (1);
-  }
-
-  //Receiver
-  Serial.println(F("LoRa Initialization OK!"));
-
-  Serial.print(F("LoRa Frequency: "));
-  Serial.println(BAND);
-
-  //
-  Serial.print(F("LoRa Spreading Factor: "));
-  Serial.println(spreadingFactor);
-  LoRa.setSpreadingFactor(spreadingFactor); //Spreading factor affects how far apart the radio's transmissions are,
-                                            //across the available bandwidth.
-                                            //Radios with different spreading factors will not receive each
-                                            //other's transmissions.
-                                            //This is one way you can filter out radios you want to ignore,
-                                            //without making an addressing scheme.
-                                             
-  Serial.print(F("LoRa Signal Bandwidth: "));
-  Serial.println(SignalBandwidth);
-  LoRa.setSignalBandwidth(SignalBandwidth); //Change the signal bandwidth (пропускная способность) of the radio.
-
-  LoRa.setCodingRate4(codingRateDenominator);
-  LoRa.setPreambleLength(preambleLength);
-
-  Serial.println(F("LoRa Initialization OK!"));
-  display.drawString(0, 40, F("LoRa Initializing OK!"));
-  display.display();
-
-  display.setFont(ArialMT_Plain_16);
-
-  delay(1500);
-
-  display.setContrast(63);
-
-  lastLight = millis();
-  
 
   // Set BTN_STOP_ALARM to input mode
   pinMode(BTN_STOP_ALARM, INPUT);
@@ -557,18 +294,27 @@ void setup() {
 
 void loop() {
   // If Timer has fired
-  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
-    uint32_t isrCount = 0, isrTime = 0;
-    // Read the interrupt count and time
-    portENTER_CRITICAL(&timerMux);
-    isrCount = isrCounter;
-    isrTime = lastIsrAt;
-    portEXIT_CRITICAL(&timerMux);
-    // Print it
-    Serial.println("Sender");
-    Sender sender_instance;
-    sender_instance.sender();
-  }
+  //if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
+  //  uint32_t isrCount = 0, isrTime = 0;
+  //  // Read the interrupt count and time
+  //  portENTER_CRITICAL(&timerMux);
+  //  isrCount = isrCounter;
+  //  isrTime = lastIsrAt;
+  //  portEXIT_CRITICAL(&timerMux);
+  //  // Print it
+  //  Serial.print("onTimer no. ");
+  //  Serial.print(isrCount);
+  //  Serial.print(" at ");
+  //  Serial.print(isrTime);
+  //  Serial.println(" ms");
+  //  Serial.println("Timer");
+  //  };
+
+  while(lastIsrAt<lastIsrAt+1000){
+    Serial.println(lastIsrAt);
+  };
+
+
   // If button is pressed
   if (digitalRead(BTN_STOP_ALARM) == LOW) {
     // If timer is still running
